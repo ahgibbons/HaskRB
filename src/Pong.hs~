@@ -1,0 +1,17 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RecursiveDo #-}
+
+module Game (pongMain) where
+
+import Graphics.Gloss
+import Graphics.Gloss.Data.Bitmap
+import Graphics.Gloss.Interface.Pure.Game
+import Control.Monad (when)
+import Data.Maybe (isJust, fromJust)
+import Data.List (nub)
+import System.Random
+import System.IO
+import Debug.Trace
+import Data.IORef
+
+

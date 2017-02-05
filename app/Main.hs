@@ -4,11 +4,11 @@
 
 module Main where
 
-import RB
+import Pong
 import Lib
 
     
 main :: IO ()
-main = glMain
+main = pongMain
 
 
