@@ -19,7 +19,8 @@ data PongGame = Game
          { ballLoc :: (Float, Float)
          , ballVel :: (Float, Float)
          , player1 :: Float
-         , player2 :: Float } deriving (Show)
+         , player2 :: Float
+         , paused :: Bool} deriving (Show)
 
 type Radius = Float
 type Position = (Float, Float)
@@ -50,7 +51,8 @@ initialState = Game
          { ballLoc = (-10, 30)
          , ballVel = (0, -50)
          , player1 = 40
-         , player2 = (-80)}
+         , player2 = (-80)
+         , paused = False}
 
 moveBall :: Float -> PongGame -> PongGame
 moveBall seconds game = game { ballLoc = (x', y')}
@@ -77,7 +79,25 @@ wallCollision (_,y) radius = topCollision || bottomCollision
     where
       topCollision    = y - radius <= (-1)* fromIntegral width / 2
       bottomCollision = y + radius >= fromIntegral width / 2
+
+movePaddleL :: Float -> PongGame -> PongGame
+movePaddleL dy game = game {player2 = y' + dy}
+    where y' = player2 game
+
+movePaddleR :: Float -> PongGame -> PongGame
+movePaddleR dy game = game {player1 = y' + dy}
+    where y' = player1 game
                         
+handleKeys :: Event -> PongGame -> PongGame
+handleKeys (EventKey (Char 'r') _ _ _) game = game { ballLoc = (0,0)}
+handleKeys (EventKey (Char 'p') _ _ _) game = let p' = paused game
+                                              in game { paused = not p'}
+handleKeys (EventKey (Char 'w') _ _ _) game = movePaddleL 10 game
+handleKeys (EventKey (Char 's') _ _ _) game = movePaddleL (-10) game
+handleKeys (EventKey (SpecialKey KeyUp) _ _ _) game = movePaddleR 10 game
+handleKeys (EventKey (SpecialKey KeyDown) _ _ _) game = movePaddleR (-10) game
+                                                 
+handleKeys _ game = game
     
 width, height, offset :: Int
 width = 300
@@ -94,11 +114,11 @@ background :: Color
 background = black
 
 
-update :: ViewPort -> Float -> PongGame -> PongGame
-update _ seconds = wallBounce . moveBall seconds
+update :: Float -> PongGame -> PongGame
+update seconds game = if pause then game
+                               else wallBounce . moveBall seconds $ game
+    where
+      pause = paused game
                   
 pongMain :: IO ()
-pongMain = simulate window background fps initialState render update
-     where
-       frame :: Float -> Picture
-       frame seconds = render $ moveBall seconds initialState
+pongMain = play window background fps initialState render handleKeys update
