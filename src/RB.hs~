@@ -1,0 +1,27 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RecursiveDo #-}
+
+module RB where
+
+import Graphics.Gloss
+import Control.Monad (when)
+import Data.Maybe (isJust, fromJust)
+import Data.List (nub)
+import System.Random
+import System.IO
+import Debug.Trace
+import Data.IORef
+
+import Reactive.Banana as R
+import Reactive.Banana.Frameworks as R
+
+glMain :: IO ()
+glMain = animate (InWindow "Nice Animation" (200,200) (10,10)) white circlePic
+--glMain = display (InWindow "Nice Window" (200,200) (10,10)) white (Circle 80)
+
+
+circlePic :: Float -> Picture
+circlePic t = Pictures [Circle (radius t), color red (circleSolid (20))]
+
+radius :: Float -> Float
+radius t = 80*(cos t)
