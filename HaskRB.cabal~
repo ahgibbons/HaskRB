@@ -19,7 +19,6 @@ library
                      , Game
                      , Pong
                      , MyTest
-                     , PitchTest
   build-depends:       base >= 4.7 && < 5
                      , random
                      , gloss
